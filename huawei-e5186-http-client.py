@@ -8,7 +8,6 @@ import re
 import time
 import datetime
 import argparse
-import os
 
 # Python3
 
@@ -24,7 +23,7 @@ import os
 #
 # passwordSHA256 = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'
 
-passwordSHA256 = os.getenv('HUAWEI_HTTP_CLIENT_PWD')
+passwordSHA256 = 'b3a5d08d38fba46a028752e96416a40fa665303a99ed241b63a885b6bcb774fd'
 
 #
 # Version
@@ -339,7 +338,7 @@ def parseArgumentsAndRun():
             pwd = args.s
         else:
             if passwordSHA256 == None:
-                raise ValueError('\nPassword hash variable is not set. Please edit \'{}\' and set variable \'passwordSHA256\' to match your router\'s password (sha256) or alternatively set password with command line option -s or expose as environment-variable.\n'.format(__file__))
+                raise ValueError('\nPassword hash variable is not set. Please edit \'{}\' and set variable \'passwordSHA256\' to match your router\'s password (sha256) or alternatively set password with command line option -s.\n'.format(__file__))
             else:
                 pwd = passwordSHA256
 
