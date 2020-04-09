@@ -124,7 +124,7 @@ class Hwcli:
 
         if tree.text != 'OK':
             if xml.find('108003') != -1:
-                print("Alread logged in - will continue.")
+                print("Already logged in - will continue.")
                 return
             else:
                 raise Exception('login: Login failed. {}'.format(xml))
