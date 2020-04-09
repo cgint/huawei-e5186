@@ -56,7 +56,8 @@ class Hwcli:
                                       'Cookie': self.sessionInfo,
                                       '__RequestVerificationToken': self.token
                                       })
-        print("apiPost", ' ', api);
+        if self.debug:
+            print("apiPost", ' ', api);
         r = self.session.post(self.apiUrl(api), data = data)
         if self.debug:
             print(r.url, '->', r.status_code)
@@ -80,16 +81,19 @@ class Hwcli:
         return r
 
     def _getSession(self):
-        print('Entered _getSession Token={} SessionInfo={}'.format(self.token, self.sessionInfo))
+        if self.debug:
+            print('Entered _getSession Token={} SessionInfo={}'.format(self.token, self.sessionInfo))
 
         #        if self.token != None and self.sessionInfo != None:
         #            return
 
-        print('Getting SesTokInfo')
+        if self.debug:
+            print('Getting SesTokInfo')
         request = self.session.get('http://' + self.baseUrl + '/api/webserver/SesTokInfo')
 
         data = request.text
-        print('SesTokInfo returned ' + data)
+        if self.debug:
+            print('SesTokInfo returned ' + data)
         tree = ET.fromstring(data)
         if len(tree.findall('TokInfo')) > 0:
             self.token = tree.findall('TokInfo')[0].text
@@ -105,7 +109,8 @@ class Hwcli:
                 print('Failed to get session info')
 
     def login(self):
-        print('About to login')
+        if self.debug:
+            print('About to login')
 
         self._getSession()
         self.session.headers.update({ 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -125,7 +130,8 @@ class Hwcli:
             else:
                 raise Exception('login: Login failed. {}'.format(xml))
 
-        print('Login succeeded: ' + p.headers['Set-Cookie'])
+        if self.debug:
+            print('Login succeeded: ' + p.headers['Set-Cookie'])
 
         # Cookie
         try:
