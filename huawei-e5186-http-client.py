@@ -23,7 +23,7 @@ import argparse
 #
 # passwordSHA256 = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'
 
-passwordSHA256 = None
+passwordSHA256 = 'b3a5d08d38fba46a028752e96416a40fa665303a99ed241b63a885b6bcb774fd'
 
 #
 # Version
@@ -51,6 +51,11 @@ class Hwcli:
 
     def apiPost(self, api = '', data = None):
         self._getSession()
+        self.session.headers.update({ 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                      'Cookie': self.sessionInfo,
+                                      '__RequestVerificationToken': self.token
+                                      })
+        print("apiPost", ' ', api);
         r = self.session.post(self.apiUrl(api), data = data)
         if self.debug:
             print(r.url, '->', r.status_code)
@@ -74,13 +79,16 @@ class Hwcli:
         return r
 
     def _getSession(self):
+        print('Entered _getSession Token={} SessionInfo={}'.format(self.token, self.sessionInfo))
 
-        if self.token != None and self.sessionInfo != None:
-            return
+        #        if self.token != None and self.sessionInfo != None:
+        #            return
 
+        print('Getting SesTokInfo')
         request = self.session.get('http://' + self.baseUrl + '/api/webserver/SesTokInfo')
 
         data = request.text
+        print('SesTokInfo returned ' + data)
         tree = ET.fromstring(data)
         if len(tree.findall('TokInfo')) > 0:
             self.token = tree.findall('TokInfo')[0].text
@@ -96,19 +104,27 @@ class Hwcli:
                 print('Failed to get session info')
 
     def login(self):
+        print('About to login')
+
         self._getSession()
         self.session.headers.update({ 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                                       'Cookie': self.sessionInfo,
-                                      '__RequestVerificationToken': self.token 
+                                      '__RequestVerificationToken': self.token
                                       })
         xml = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<request>\n <Username>{}</Username>\n <Password>{}</Password>\n <password_type>4</password_type>\n</request>\n'.format(self.username, self._authToken())
         p = self.apiPost('/api/user/login', xml)
-        xml = p.text 
+        xml = p.text
 
         tree = ET.fromstring(xml)
 
         if tree.text != 'OK':
-            raise Exception('login: Login failed.')
+            if xml.find('108003') != -1:
+                print("Alread logged in - will continue.")
+                return
+            else:
+                raise Exception('login: Login failed. {}'.format(xml))
+
+        print('Login succeeded: ' + p.headers['Set-Cookie'])
 
         # Cookie
         try:
@@ -157,7 +173,7 @@ class Hwcli:
                             else:
                                 for i in item:
                                     children = list(i)
-                                    if children != None: 
+                                    if children != None:
                                         print('{}<{}>'.format(pad * lvl, i.tag), end = '')
                                         if len(children) > 0:
                                             print()
@@ -198,7 +214,7 @@ class Hwcli:
         self.dumpXMLFields(fields, self.apiGet('/api/wlan/handover-setting').content)
     def apiGlobalModuleSwitch(self, fields):
         self.dumpXMLFields(fields, self.apiGet('/api/global/module-switch').content)
-        
+
     def apiSmsInbox(self, fields = None):
         xml = '<?xml version="1.0" encoding="UTF-8"?><request><PageIndex>1</PageIndex><ReadCount>10</ReadCount><BoxType>1</BoxType><SortType>0</SortType><Ascending>0</Ascending><UnreadPreferred>1</UnreadPreferred></request>'
         self.dumpXMLFields(fields, self.apiPost('/api/sms/sms-list', xml).content)
@@ -254,7 +270,7 @@ def parseArgumentsAndRun():
 
     subParsers = parser.add_subparsers(title='commands', dest = 'commands')
 
-    # Configure 'main parser'                                            
+    # Configure 'main parser'
     parser.add_argument('-v', '--version', action='version', version = '%(prog)s {}'.format(version), help = 'Display version number')
     parser.add_argument('-d', '--debug', action = 'store_true', default = False, help = 'Show debug information.')
     parser.add_argument('-t', metavar = 'address', type=str, default = '192.168.8.1', help = 'Target hostname or IP-address')
@@ -299,7 +315,7 @@ def parseArgumentsAndRun():
     for k in dataarr:
         prsr = dataSubParsers.add_parser(k, help = dataarr[k][0])
         prsr.add_argument('fields', nargs = '*', type = str, metavar = 'FILTER', help = 'XML XPath spec.')
- 
+
     # Config 'macfilter'
     filter_parser.add_argument('type', type = str, help = 'disable, allow, deny')
     filter_parser.add_argument('mac', nargs = '+', type = str, help = 'MAC address.')
@@ -312,7 +328,7 @@ def parseArgumentsAndRun():
 
     if args.commands == None: parser.print_help()
     else:
-        if args.s != None: 
+        if args.s != None:
             pwd = args.s
         else:
             if passwordSHA256 == None:
@@ -321,7 +337,7 @@ def parseArgumentsAndRun():
                 pwd = passwordSHA256
 
         hw = Hwcli(baseUrl = args.t, password = pwd)
-        hw.debug = args.debug 
+        hw.debug = args.debug
         hw.login()
 
         if args.commands == 'show':
