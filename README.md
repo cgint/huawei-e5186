@@ -45,3 +45,7 @@ Use -t option to set an alternative address/hostname.
 ```python3 huawei-e5186-http-client.py data on```
 
 ```python3 huawei-e5186-http-client.py data off```
+
+### Reconnect mobile data with only one login
+
+```python3 huawei-e5186-http-client.py reconnect```
