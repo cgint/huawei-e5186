@@ -286,7 +286,7 @@ def parseArgumentsAndRun():
     # Create 'sub parsers'
     show_parser   = subParsers.add_parser('show', help = 'Show router information.')
     data_parser   = subParsers.add_parser('data', help = 'Enable or disable mobile data.')
-    data_parser   = subParsers.add_parser('reconnect', help = 'Reconnect by disabling+enabling mobile data.')
+    reconnect_parser   = subParsers.add_parser('reconnect', help = 'Reconnect by disabling+enabling mobile data.')
     reboot_parser = subParsers.add_parser('reboot', help = 'Reboot router.')
     send_parser   = subParsers.add_parser('sendsms', help = 'Send SMS message.')
     filter_parser = subParsers.add_parser('mac-filter', help = 'Set MAC filtering.')
