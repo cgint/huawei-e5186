@@ -7,9 +7,7 @@ This script assumes router has 'admin' user account.
 
 Edit the router's password to variable passwordSHA256 (as SHA256 hexdigest)
 -or-
-set your password with command line option -s
--or-
-configure your password as environment-variable 'HUAWEI_HTTP_CLIENT_PWD'.
+set your password with command line option -s.
 
 You can convert your plaintext password to SHA256 hexdigest with following command:
 

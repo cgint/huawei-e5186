@@ -340,13 +340,14 @@ def parseArgumentsAndRun():
             pwd = args.s
         else:
             if passwordSHA256 == None:
-                raise ValueError('\nPassword hash variable is not set. Please edit \'{}\' and set variable \'passwordSHA256\' to match your router\'s password (sha256) or alternatively set password with command line option -s or expose as environment-variable.\n'.format(__file__))
+                raise ValueError('\nPassword hash variable is not set. Please edit \'{}\' and set variable \'passwordSHA256\' to match your router\'s password (sha256) or alternatively set password with command line option -s.\n'.format(__file__))
             else:
                 pwd = passwordSHA256
 
         hw = Hwcli(baseUrl = args.t, password = pwd)
         hw.debug = args.debug
-        hw.login()
+        if args.commands != 'show':
+            hw.login()
 
         if args.commands == 'show':
             try:
