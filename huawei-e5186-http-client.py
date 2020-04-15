@@ -237,7 +237,7 @@ class Hwcli:
             if type(phone) is str: plist += '<Phone>{}</Phone>'.format(phone)
             else: print('Invalid recipient \'{}\' skipped.'.format(str(phone)))
 
-        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><request><Index>-1</Index><Phones>" + plist + "</Phones><Sca></Sca><Content>" + message + "</Content><Length>" + str(len(message)) + "</Length><Reserved>1</Reserved><Date>" + future.strftime('%Y-%m%d %H:%M:%S') + "</Date></request>"
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><request><Index>-1</Index><Phones>" + plist + "</Phones><Sca></Sca><Content>" + message + "</Content><Length>" + str(len(message)) + "</Length><Reserved>1</Reserved><Date>" + future.strftime('%Y-%m-%d %H:%M:%S') + "</Date></request>"
         r = self.apiPost('/api/sms/send-sms', str(xml))
 
     def apiReboot(self, fields = None):
